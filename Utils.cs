@@ -37,9 +37,9 @@ public class Utils {
     public static PR getPR() {
         return (M2DBase.Instance as NelM2DBase)?.getPrNoel();
     }
-    
+
     public static string ShowInputDialog(string text, string caption) {
-        using (Form prompt = new Form()) {
+        using (Form prompt = new()) {
             prompt.Width = 400;
             prompt.Height = 150;
             prompt.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -47,10 +47,10 @@ public class Utils {
             prompt.StartPosition = FormStartPosition.CenterScreen;
             prompt.TopMost = true; // 确保在游戏窗口最上层
 
-            Label textLabel = new Label() { Left = 20, Top = 20, Text = text, Width = 340 };
-            TextBox textBox = new TextBox() { Left = 20, Top = 50, Width = 340 };
-            Button confirmation = new Button() { Text = "确定", Left = 260, Width = 100, Top = 80, DialogResult = DialogResult.OK };
-        
+            Label textLabel = new() { Left = 20, Top = 20, Text = text, Width = 340 };
+            TextBox textBox = new() { Left = 20, Top = 50, Width = 340 };
+            Button confirmation = new() { Text = "确定", Left = 260, Width = 100, Top = 80, DialogResult = DialogResult.OK };
+
             prompt.Controls.Add(textBox);
             prompt.Controls.Add(confirmation);
             prompt.Controls.Add(textLabel);

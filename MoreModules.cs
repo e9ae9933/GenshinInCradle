@@ -5,6 +5,7 @@ using m2d;
 using nel;
 using UnityEngine;
 using XX;
+using Logger = XX.Logger;
 
 namespace GenshinInCradle;
 
@@ -13,7 +14,7 @@ public class MoreModules {
     [HarmonyPatch(typeof(UIPictureBase), "emotSuperSensitive")]
     public static void onGetEmotSP(UIPictureBase __instance, ref UIPictureBase.EMSTATE st, ref UIEMOT __result) {
         if (!Configs.configSuppressNonSensitive.Value) return;
-        ref var v = ref __result;
+        ref UIEMOT v = ref __result;
         st &= UIPictureBase.EMSTATE.NORMAL |
               UIPictureBase.EMSTATE.BATTLE |
               UIPictureBase.EMSTATE.LOWHP |
@@ -68,7 +69,7 @@ public class MoreModules {
     public static void onApplyHpDamage(NelEnemy __instance, int val, ref int mpdmg, bool force, NelAttackInfo Atk) {
         if (!Configs.configShowDamage.Value) return;
         if (Atk.AttackFrom is PR) {
-            var ratio = (double)val / Atk._hpdmg;
+            double ratio = (double)val / Atk._hpdmg;
             UILog.Instance.AddLog(
                 $"{NDAT.getEnemyName(__instance.id)} 伤害 {Atk._hpdmg} -> {val} / 伤害倍率 {100 * ratio:F2}%");
         }
@@ -79,7 +80,7 @@ public class MoreModules {
     public static void suppress(M2Ser __instance, SER ser, ref bool __runOriginal) {
         if (!Configs.configSuppressBurstFaint.Value) return;
         if (ser == SER.BURST_TIRED) {
-            var ratio = (__instance.Mv as PR)?.Skill?.getBurstSelector()?.fainted_ratio ?? -1;
+            float ratio = (__instance.Mv as PR)?.Skill?.getBurstSelector()?.fainted_ratio ?? -1;
             if (ratio >= 0) {
                 if (ratio < 1) {
                     __runOriginal = false;
@@ -108,7 +109,7 @@ public class MoreModules {
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(XX.Logger), "fineTimeStampViewer")]
+    [HarmonyPatch(typeof(Logger), "fineTimeStampViewer")]
     public static void onFineTimeStampViewer() {
         if (!Configs.configAlwaysF7.Value) return;
         X.DEBUGANNOUNCE = true;

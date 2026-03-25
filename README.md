@@ -4,38 +4,55 @@
 
 # GenshinInCradle (摇篮里的原神)
 
-[cite_start]GenshinInCradle 是一款为《Alice in Cradle》打造的极度硬核的**底层机制研究、TAS 辅助与乱数操控（RNG）综合型 Mod** [cite: 205, 398][cite_start]。当然，正如它的名字一样，它还夹带了一些能让玩家会心一笑的“原神”角色技能复刻私货 [cite: 318, 351, 366]。
+[cite_start]GenshinInCradle 是一款为《Alice in Cradle》打造的极度硬核的**底层机制研究、TAS 辅助与乱数操控（RNG）综合型 Mod
+** [cite: 205, 398][cite_start]
+。当然，正如它的名字一样，它还夹带了一些能让玩家会心一笑的“原神”角色技能复刻私货 [cite: 318, 351, 366]。
 
 [cite_start]本项目基于 BepInEx 与 Harmony 构建，适用于硬核玩家、速通玩家（Speedrunner）以及游戏底层机制研究者 [cite: 205]。
 
 ## ✨ 核心特性
 
 ### 1. 🔍 机制可视化与硬核调试 (Visual Debugging)
+
 彻底扒开游戏底层的渲染与判定逻辑，将一切数据可视化：
+
 * [cite_start]**全方位判定盒显示**：支持实时显示玩家/敌人的攻击判定盒、实体碰撞箱、以及地形 Map Box [cite: 192]。
-* [cite_start]**毒雾与魔法追踪**：将不可见的“毒雾 (MIST)”数据网格化显示在屏幕上，并实时追踪场上所有魔法弹道的生命周期与底层参数 [cite: 114, 192]。
+* [cite_start]**毒雾与魔法追踪**：将不可见的“毒雾 (MIST)
+  ”数据网格化显示在屏幕上，并实时追踪场上所有魔法弹道的生命周期与底层参数 [cite: 114, 192]。
 * [cite_start]**玩家状态监控**：精确显示 Noel 的坐标、速度、无敌帧、当前状态，以及晕厥和下沉进度条 [cite: 193]。
 
 ### 2. ⏱️ TAS 辅助与帧率控制 (TAS & Frame Control)
+
 为逐帧分析和理论极限操作提供强大的基础设施：
+
 * [cite_start]**帧率与时间轴掌控**：支持一键暂停游戏，并通过快捷键精确步进（加速/减速 5 帧） [cite: 194, 195]。
 * [cite_start]**无损序列截图**：开启后可在每帧渲染结束时自动导出游戏无损画面，防止录屏掉帧 [cite: 196, 390]。
-* [cite_start]**精准音效回放 (SoundReplay)**：即使在复杂的帧步进和回溯中，也能完美记录并同步回放底层音频指令 [cite: 202, 444]。
+* [cite_start]**精准音效回放 (SoundReplay)**
+  ：即使在复杂的帧步进和回溯中，也能完美记录并同步回放底层音频指令 [cite: 202, 444]。
 
 ### 3. 🎲 RNG 预测与乱数操控 (RNG Manipulation)
+
 将游戏的伪随机系统玩弄于股掌之间：
+
 * [cite_start]**种子获取与修改**：随时获取当前的底层随机数种子（`Xors`），并支持强行覆盖与锁定 [cite: 196, 221]。
-* [cite_start]**超高速刷怪推演**：劫持 `EnemySummoner`，允许在后台瞬间推演高达 20 亿次的刷怪乱数，预测极低概率的“原生/雷暴污染体”，并导出至 `.aicseed` 文件 [cite: 418, 419, 420]。
+* [cite_start]**超高速刷怪推演**：劫持 `EnemySummoner`，允许在后台瞬间推演高达 20 亿次的刷怪乱数，预测极低概率的“原生/雷暴污染体”，并导出至
+  `.aicseed` 文件 [cite: 418, 419, 420]。
 * [cite_start]**机制抑制器**：可强制关闭伤害的随机浮动（锁死伤害方差），或抑制圣光晕厥概率 [cite: 197, 296, 305]。
 
 ### 4. 🌟 原神角色技能复刻 (Genshin Emulation)
+
 通过暴力魔改魔法与碰撞逻辑，在二维世界体验提瓦特科技：
+
 * [cite_start]**💧 那维莱特**：重写白箭魔法。蓄力完成时自动环绕索敌，发射多重水柱洗地 [cite: 318, 320, 330]。
-* [cite_start]**👹 魈**：重写下落攻击。大幅扩大攻击判定范围（x10），移除蓝耗并附带强力屏幕震动，还原“靖妖傩舞” [cite: 351, 363, 364]。
-* [cite_start]**🦋 胡桃**：重写伤害结算。受到致命伤时强制锁定 100 剩余血量，瞬间清空负面状态并满蓝进入爆气（BURST）状态，实现极限反杀 [cite: 366, 367, 368]。
+* [cite_start]**👹 魈**
+  ：重写下落攻击。大幅扩大攻击判定范围（x10），移除蓝耗并附带强力屏幕震动，还原“靖妖傩舞” [cite: 351, 363, 364]。
+* [cite_start]**🦋 胡桃**：重写伤害结算。受到致命伤时强制锁定 100
+  剩余血量，瞬间清空负面状态并满蓝进入爆气（BURST）状态，实现极限反杀 [cite: 366, 367, 368]。
 
 ### 5. 🛠️ 实用功能与漏洞修复 (QoL & Fixes)
-* [cite_start]**实用功能**：一键获取全物品 [cite: 197][cite_start]、强行随地存档 [cite: 203][cite_start]、实时精准伤害数字显示 [cite: 199, 301][cite_start]、以及“超超健全”模式（和谐爆衣与战损） [cite: 199, 292]。
+
+* [cite_start]**实用功能**：一键获取全物品 [cite: 197][cite_start]、强行随地存档 [cite: 203][cite_start]
+  、实时精准伤害数字显示 [cite: 199, 301][cite_start]、以及“超超健全”模式（和谐爆衣与战损） [cite: 199, 292]。
 * [cite_start]**底层 Bug 修复**：修复了原版游戏中 `MGContainer` 等内存池释放的错误分配恶性 Bug [cite: 198, 238]。
 
 ---
@@ -44,17 +61,17 @@
 
 所有快捷键均可在配置中修改，以下为默认按键：
 
-| 功能 | 快捷键 |
-| :--- | :--- |
-| **暂停游戏** | [cite_start]`End` [cite: 194] |
-| **加速 5 帧** | [cite_start]`PageUp` [cite: 194] |
-| **减速 5 帧** | [cite_start]`PageDown` [cite: 195] |
-| **获取当前种子** | [cite_start]`F12` [cite: 196] |
-| **手动修改种子** | [cite_start]`F12` + `S` [cite: 196] |
-| **一键获取全物品** | [cite_start]`F12` + `I` [cite: 197] |
-| **立刻随地存档** | [cite_start]`Ctrl` + `Alt` + `S` [cite: 203] |
-| **触发 RNG 高速推演**| [cite_start]`Insert` (可配合数字键 5~9 选择推演次数) [cite: 418, 419] |
-| **音效回放面板** | [cite_start]`F11` 配合 `P`(播放) / `S`(保存) / `R`(读取) / `D`(重置) [cite: 202, 203] |
+| 功能              | 快捷键                                                                         |
+|:----------------|:----------------------------------------------------------------------------|
+| **暂停游戏**        | [cite_start]`End` [cite: 194]                                               |
+| **加速 5 帧**      | [cite_start]`PageUp` [cite: 194]                                            |
+| **减速 5 帧**      | [cite_start]`PageDown` [cite: 195]                                          |
+| **获取当前种子**      | [cite_start]`F12` [cite: 196]                                               |
+| **手动修改种子**      | [cite_start]`F12` + `S` [cite: 196]                                         |
+| **一键获取全物品**     | [cite_start]`F12` + `I` [cite: 197]                                         |
+| **立刻随地存档**      | [cite_start]`Ctrl` + `Alt` + `S` [cite: 203]                                |
+| **触发 RNG 高速推演** | [cite_start]`Insert` (可配合数字键 5~9 选择推演次数) [cite: 418, 419]                   |
+| **音效回放面板**      | [cite_start]`F11` 配合 `P`(播放) / `S`(保存) / `R`(读取) / `D`(重置) [cite: 202, 203] |
 
 ---
 
@@ -63,7 +80,8 @@
 1. 确保您的游戏已正确安装 [BepInEx](https://github.com/BepInEx/BepInEx) 框架。
 2. 下载本项目的 `.dll` 文件并放入 `BepInEx/plugins` 目录中。
 3. 启动游戏一次以生成配置文件。
-4. [cite_start]打开 `BepInEx/config/com.yourname.genshinincradle.cfg`，你可以根据需求开启或关闭不需要的高级功能（如调试框显示、原神技能模拟等） [cite: 190, 192]。
+4. [cite_start]打开 `BepInEx/config/com.yourname.genshinincradle.cfg`
+   ，你可以根据需求开启或关闭不需要的高级功能（如调试框显示、原神技能模拟等） [cite: 190, 192]。
 
 ---
 
@@ -71,6 +89,7 @@
 
 [cite_start]本 Mod 旨在进行游戏底层机制的技术探讨与 TAS 辅助，**请务必注意随地存档和乱数修改带来的坏档风险** [cite: 217]。
 
-本项目采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans) 协议开源，允许非商业性自由修改与学习，但需注明原作者及保持同等协议分发。
+本项目采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans)
+协议开源，允许非商业性自由修改与学习，但需注明原作者及保持同等协议分发。
 
 ***

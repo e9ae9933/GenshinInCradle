@@ -5,7 +5,6 @@ using CriWare;
 using HarmonyLib;
 using m2d;
 using nel;
-using UnityEngine;
 using XX;
 using YamlDotNet.Serialization;
 
@@ -38,23 +37,23 @@ public class SoundReplay {
         }
 
         if (Configs.configReadSoundShortcut.Value.IsDown()) {
-            var des = new DeserializerBuilder().Build();
-            var lst = des.Deserialize<List<Rec>>(File.ReadAllText("sound.yml"));
+            IDeserializer des = new DeserializerBuilder().Build();
+            List<Rec> lst = des.Deserialize<List<Rec>>(File.ReadAllText("sound.yml"));
             replayQueue = new Queue<Rec>(lst);
             UILog.Instance.AddAlert("read from yml");
         }
 
         if (Configs.configSaveSoundShortcut.Value.IsDown()) {
-            var ser = new SerializerBuilder().Build();
+            ISerializer ser = new SerializerBuilder().Build();
             File.WriteAllText("sound.yml", ser.Serialize(replayQueue));
             UILog.Instance.AddAlert("wrote to yml");
         }
 
         if (!replaying) {
-            var ser = new SerializerBuilder().Build();
+            ISerializer ser = new SerializerBuilder().Build();
             double now = Advanced.passedFrames;
-            foreach (var tp in theList) {
-                var rec = getRec(tp.Item2, tp.Item1, now);
+            foreach (Tuple<Rec.What, M2SoundPlayerItem> tp in theList) {
+                Rec rec = getRec(tp.Item2, tp.Item1, now);
                 //Console.WriteLine("cue "+tp.Item1+" "+rec.current_cue);
                 replayQueue.Enqueue(rec);
             }
@@ -66,12 +65,12 @@ public class SoundReplay {
             replayTime = (DateTime.Now.Ticks - replayStartingTicks) / 10000000.0 * 60;
             Console.WriteLine(replayTime);
             Advanced.passedFrames = (long)replayTime;
-            var snd = M2DBase.Instance.Snd;
+            M2SoundPlayer snd = M2DBase.Instance.Snd;
             float pre_x = snd.pre_x, pre_y = snd.pre_y;
             while (replayQueue.Count > 0 && replayQueue.Peek().time <= replayTime) {
-                var rec = replayQueue.Dequeue();
+                Rec rec = replayQueue.Dequeue();
                 if (rec.what == Rec.What.PREPARE) {
-                    var index = rec.index;
+                    int index = rec.index;
                     M2SoundPlayerItem ans;
                     if (rec.mapx == 0 && rec.mapy == 0) {
                         ans = snd.play(rec.current_cue);
@@ -89,7 +88,7 @@ public class SoundReplay {
                     }
                 }
                 else if (rec.what == Rec.What.STOP) {
-                    var index = rec.index;
+                    int index = rec.index;
                     if (replayItems.ContainsKey(index)) {
                         Console.WriteLine($"stop {rec.current_cue}");
                         replayItems[index].Stop();
@@ -106,9 +105,9 @@ public class SoundReplay {
 
     private static Rec getRec(M2SoundPlayerItem player, Rec.What what, double now) {
         if (!dict.ContainsKey(player)) dict[player] = top++;
-        var index = dict[player];
+        int index = dict[player];
         float pre_x = player.Con.pre_x, pre_y = player.Con.pre_y;
-        var rt = new Rec {
+        Rec rt = new() {
             what = what,
             time = now,
             key = player.key,

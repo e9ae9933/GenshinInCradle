@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using HarmonyLib;
 using m2d;
 using nel;
+using nel.smnp;
 using UnityEngine;
 using XX;
 using Logger = XX.Logger;
@@ -34,8 +33,8 @@ public class Advanced {
     }
 
     public static void cast2(M2Ray instance, out float num, out float num2, out float num3, out float num4) {
-        var shape = instance.shape;
-        var radius = instance.radius;
+        RAYSHAPE shape = instance.shape;
+        float radius = instance.radius;
         num = num4 = 0;
         num2 = num3 = 1;
         if (shape == RAYSHAPE.RECT) goto end;
@@ -63,8 +62,8 @@ public class Advanced {
     }
 
     private static Tuple<float, float> toScreen(ref float x, ref float y) {
-        var m2d = M2DBase.Instance as NelM2DBase;
-        var mp = m2d.curMap;
+        NelM2DBase m2d = M2DBase.Instance as NelM2DBase;
+        Map2d mp = m2d.curMap;
         x = mp.ux2effectScreenx(mp.map2ux(x)) * 64;
         y = mp.uy2effectScreeny(mp.map2uy(y)) * 64;
         return new Tuple<float, float>(x, y);
@@ -72,13 +71,13 @@ public class Advanced {
 
     public static void renderWholeMoverMode2(ref ProjectionContainer JCon, ref Camera Cam, ref int draw_id,
         ref List<M2RenderTicket>[] ___AADob) {
-        var list = ___AADob[draw_id];
-        var m2d = M2DBase.Instance as NelM2DBase;
-        var mp = m2d.curMap;
+        List<M2RenderTicket> list = ___AADob[draw_id];
+        NelM2DBase m2d = M2DBase.Instance as NelM2DBase;
+        Map2d mp = m2d.curMap;
         GL.LoadProjectionMatrix(JCon.CameraProjectionTransformed);
         if (Configs.configDisplayAttackBox.Value)
-            foreach (var ray in rayList) {
-                var md2 = new MeshDrawer();
+            foreach (M2Ray ray in rayList) {
+                MeshDrawer md2 = new();
                 md2.activate("attack_box_refreshed", MTRX.MtrMeshNormal, false, C32.d2c(0xFFFFFFFFU));
                 md2.Col = C32.d2c(0xFFFFFFFFU);
                 if (ray.Caster == null || ray.Caster.transform == null) {
@@ -87,36 +86,36 @@ public class Advanced {
                 }
 
                 float num, num2, num3, num4;
-                var clenb = mp.CLENB;
+                float clenb = mp.CLENB;
                 cast2(ray, out num, out num2, out num3, out num4);
                 float x = ray.getUPos().x / clenb * 64, y = ray.getUPos().y / clenb * 64;
                 float ratio = 64;
                 if (num2 == 0f) {
                     float sx = x * clenb, sy = y * clenb, r = num3 * ratio;
-                    var tx = sx + ray.Dir.x * ray.len * ratio;
-                    var ty = sy + ray.Dir.y * ray.len * ratio;
-                    var dis = (float)Math.Sqrt((sx - tx) * (sx - tx) + (sy - ty) * (sy - ty));
+                    float tx = sx + ray.Dir.x * ray.len * ratio;
+                    float ty = sy + ray.Dir.y * ray.len * ratio;
+                    float dis = (float)Math.Sqrt((sx - tx) * (sx - tx) + (sy - ty) * (sy - ty));
                     List<Vector4> v = new();
                     const int n = 12;
-                    for (var j = 0; j <= n; j++) {
-                        var angle = Math.PI * j / n + Math.PI / 2;
+                    for (int j = 0; j <= n; j++) {
+                        double angle = Math.PI * j / n + Math.PI / 2;
                         v.Add(new Vector4((float)Math.Cos(angle) * r, (float)Math.Sin(angle) * r, 0, 1));
                     }
 
-                    for (var j = 0; j <= n; j++) {
-                        var angle = Math.PI * j / n - Math.PI / 2;
+                    for (int j = 0; j <= n; j++) {
+                        double angle = Math.PI * j / n - Math.PI / 2;
                         v.Add(new Vector4((float)Math.Cos(angle) * r + dis, (float)Math.Sin(angle) * r, 0, 1));
                     }
 
-                    var m = v.Count;
-                    var q = Quaternion.AngleAxis((float)(Math.Atan2(ty - sy, tx - sx) * 180.0 / Math.PI),
+                    int m = v.Count;
+                    Quaternion q = Quaternion.AngleAxis((float)(Math.Atan2(ty - sy, tx - sx) * 180.0 / Math.PI),
                         new Vector3(0, 0, 1));
-                    var transform = Matrix4x4.Translate(new Vector3(sx, sy, 0)) * Matrix4x4.Rotate(q);
+                    Matrix4x4 transform = Matrix4x4.Translate(new Vector3(sx, sy, 0)) * Matrix4x4.Rotate(q);
                     md2.Col = C32.d2c(0xBFFF0000);
-                    for (var j = 2; j < m; j++) {
-                        var v0 = transform * v[0];
-                        var v1 = transform * v[j];
-                        var v2 = transform * v[j - 1];
+                    for (int j = 2; j < m; j++) {
+                        Vector4 v0 = transform * v[0];
+                        Vector4 v1 = transform * v[j];
+                        Vector4 v2 = transform * v[j - 1];
                         md2.Triangle(v0.x, v0.y, v1.x, v1.y, v2.x, v2.y);
                     }
 
@@ -125,9 +124,9 @@ public class Advanced {
                 }
                 else {
                     float sx = x * clenb, sy = y * clenb;
-                    var tx = sx + ray.Dir.x * ray.len * ratio;
-                    var ty = sy + ray.Dir.y * ray.len * ratio;
-                    var dis = (float)Math.Sqrt((sx - tx) * (sx - tx) + (sy - ty) * (sy - ty));
+                    float tx = sx + ray.Dir.x * ray.len * ratio;
+                    float ty = sy + ray.Dir.y * ray.len * ratio;
+                    float dis = (float)Math.Sqrt((sx - tx) * (sx - tx) + (sy - ty) * (sy - ty));
                     num2 *= ray.radius * ratio;
                     num3 *= ray.radius * ratio;
 
@@ -144,27 +143,27 @@ public class Advanced {
         //ray end
         // map start
         if (Configs.configDisplayMapBox.Value) {
-            var mdb = new MeshDrawer();
+            MeshDrawer mdb = new();
             mdb.activate("map_box", MTRX.MtrMeshNormal, false, C32.d2c(0xFFFFFFFFU));
             // M2FootManager foot = mp.Pr.getFootManager();
             // Console.WriteLine($"{foot.getFootTime()} {foot.vague_foot} {mp.Pr.hasFoot()} {mp.Pr.canJump()}");
-            var draw = (BCCLine Bcc, uint col) => {
+            Action<BCCLine, uint> draw = (Bcc, col) => {
                 float shiftx, shifty;
                 Bcc.BCC.getBaseShift(out shiftx, out shifty);
-                var flag = mp.Pr.getPhysic().getFootManager().get_FootBCC() == Bcc;
+                bool flag = mp.Pr.getPhysic().getFootManager().get_FootBCC() == Bcc;
                 // float num = mp.Pr.mleft + shiftx;
                 // float num2 = mp.Pr.mtop + shifty;
                 // float num3 = mp.Pr.mright + shiftx;
                 // float num4 = (flag ? mp.Pr.mbottom : X.Mx(mp.Pr.y, mp.Pr.mbottom - 0.22f)) + shifty;
                 if (Bcc.AMapDmg != null)
-                    foreach (var ditem in Bcc.AMapDmg) {
+                    foreach (M2MapDamageContainer.M2MapDamageItem ditem in Bcc.AMapDmg) {
                         mdb.Col = C32.d2c(0xFFFF7F00U);
-                        var extendx = 0.14f;
-                        var extendy = Bcc._xd != 0 || (!flag && Bcc.foot_aim == AIM.B) ? -0.23f : extendx;
-                        var l = ditem.x - extendx;
-                        var r = ditem.right + extendx;
-                        var u = ditem.y - extendy;
-                        var d = ditem.bottom + extendy;
+                        float extendx = 0.14f;
+                        float extendy = Bcc._xd != 0 || !flag && Bcc.foot_aim == AIM.B ? -0.23f : extendx;
+                        float l = ditem.x - extendx;
+                        float r = ditem.right + extendx;
+                        float u = ditem.y - extendy;
+                        float d = ditem.bottom + extendy;
                         toScreen(ref l, ref u);
                         toScreen(ref r, ref d);
                         mdb.Line(l, u, l, d, 2);
@@ -174,10 +173,10 @@ public class Advanced {
                     }
 
                 {
-                    var l = Bcc.x - 0.18f;
-                    var r = Bcc.right + 0.18f;
-                    var u = Bcc.y - 0.18f;
-                    var d = Bcc.bottom + 0.18f;
+                    float l = Bcc.x - 0.18f;
+                    float r = Bcc.right + 0.18f;
+                    float u = Bcc.y - 0.18f;
+                    float d = Bcc.bottom + 0.18f;
                     toScreen(ref l, ref u);
                     toScreen(ref r, ref d);
                     mdb.Col = C32.d2c(col);
@@ -195,10 +194,10 @@ public class Advanced {
                 mdb.Box(sx, sy, 8, 8);
                 mdb.Box(dx, dy, 8, 8);
             };
-            foreach (var bccLine in mp.BCC.getLineVectorLift() ?? [])
+            foreach (BCCLine bccLine in mp.BCC.getLineVectorLift() ?? [])
                 draw(bccLine, 0xFF7FFF00);
-            foreach (var bccLinese in mp.BCC.getLineVector() ?? [])
-            foreach (var bccLine in bccLinese)
+            foreach (BCCLine[] bccLinese in mp.BCC.getLineVector() ?? [])
+            foreach (BCCLine bccLine in bccLinese)
                 draw(bccLine, 0xFFCFFF00);
             BLIT.RenderToGLImmediate001(mdb, setpass: true);
         }
@@ -207,18 +206,18 @@ public class Advanced {
         if (Configs.configDisplayPlayer.Value && Utils.getPR() != null) renderPlayer(Utils.getPR());
         // bounding box start
         if (Configs.configDisplayBoundingBox.Value) {
-            var md = new MeshDrawer();
+            MeshDrawer md = new();
             md.activate("bounding_box_refresh", MTRX.MtrMeshNormal, false, C32.d2c(0xFFFFFFFFU));
-            for (var mvc = 0; mvc < mp.mover_count; mvc++) {
-                var mover = mp.getMv(mvc);
+            for (int mvc = 0; mvc < mp.mover_count; mvc++) {
+                M2Mover mover = mp.getMv(mvc);
                 if (mover == null) continue;
                 // Console.WriteLine("found mover " + mover);
                 if (mover.getColliderCreator() == null) continue;
-                var cld = mover.getColliderCreator().Cld;
+                PolygonCollider2D cld = mover.getColliderCreator().Cld;
                 if (cld == null) continue;
                 // Console.WriteLine("found cld with count "+cld.pathCount);
-                for (var pcnt = 0; pcnt < cld.pathCount; pcnt++) {
-                    var v = cld.GetPath(pcnt);
+                for (int pcnt = 0; pcnt < cld.pathCount; pcnt++) {
+                    Vector2[] v = cld.GetPath(pcnt);
                     if (v == null) continue;
                     float baseX = mover.x, baseY = mover.y;
                     toScreen(ref baseX, ref baseY);
@@ -230,10 +229,10 @@ public class Advanced {
                             md.Col = C32.d2c(0xFF00FF00U);
                     }
 
-                    var n = v.Length;
-                    for (var i = 0; i < n; i++) {
-                        var j = (i + 1) % n;
-                        var d = 64f;
+                    int n = v.Length;
+                    for (int i = 0; i < n; i++) {
+                        int j = (i + 1) % n;
+                        float d = 64f;
                         md.Line(baseX + v[i].x * d, baseY + v[i].y * d, baseX + v[j].x * d, baseY + v[j].y * d,
                             3);
                     }
@@ -248,34 +247,35 @@ public class Advanced {
         }
 
         if (Configs.configDisplayMagicItem.Value) {
-            var mgc = m2d.MGC;
-            var mgs = Utils.getField<MagicItem[]>(mgc, "AItems");
+            MGContainer mgc = m2d.MGC;
+            MagicItem[] mgs = Utils.getField<MagicItem[]>(mgc, "AItems");
             MeshDrawer mdGraphics = new(), mdText = new();
             mdGraphics.activate("magic_dumper_graphics", MTRX.MtrMeshNormal, false, C32.d2c(0xFFFFFFFFU));
             mdText.activate("magic_dumper_text", UnifontRenderer.glyphMaterial, false, C32.d2c(0xFFFFFFFFU));
-            for (var i = 0; i < mgs.Length; i++) {
-                var mg = mgs[i];
+            for (int i = 0; i < mgs.Length; i++) {
+                MagicItem mg = mgs[i];
                 if (mg == null || mg.kind == MGKIND.NONE || mg.closed || mg.killed) continue;
                 Console.WriteLine($"found magic {mg}");
                 float x = mg.sx, y = mg.sy;
                 toScreen(ref x, ref y);
                 mdGraphics.Col = C32.d2c(0xFFFF00FF);
                 mdGraphics.Rect(x, y, 3, 3);
-                var c = 0xFFFFFFFF;
+                uint c = 0xFFFFFFFF;
                 if (mg.closed && mg.killed) c = 0x3FFFFFFF;
                 else if (mg.closed) c = 0x7F7FFF7F;
                 else if (mg.killed) c = 0x7FFF7F7F;
                 mdText.Col = C32.d2c(c);
-                UnifontRenderer.draw(mdText, $"MagicItem #{i} / {mg.kind}", x, y, 1, 1);
-                UnifontRenderer.draw(mdText, $"Caster {mg.Caster}", x, y + 16, 1, 1);
-                UnifontRenderer.draw(mdText, $"casttime {mg.casttime} / t {mg.t}", x, y + 32, 1, 1);
-                UnifontRenderer.draw(mdText, $"phase {mg.phase} / type {mg.type}", x, y + 48, 1, 1);
-                UnifontRenderer.draw(mdText, $"(sx, sy) = ({mg.sx}, {mg.sy}) / (dx, dy) = ({mg.dx}, {mg.dy})", x,
-                    y + 64, 1, 1);
-                UnifontRenderer.draw(mdText, $"sa {mg.sa} / da {mg.da} / sz {mg.sz} / dz {mg.dz}", x, y + 80, 1, 1);
-                var fnRunMain = Utils.getField<MagicItem.FnMagicRun>(mg, "fnRunMain");
-                UnifontRenderer.draw(mdText, $"fnRunMain {fnRunMain.Method.DeclaringType} : {fnRunMain.Method}", x,
-                    y + 96, 1, 1);
+                List<string> targetStrings = new();
+                targetStrings.Add($"MagicItem #{i} / {mg.kind}");
+                targetStrings.Add($"Caster {mg.Caster}");
+                targetStrings.Add($"casttime {mg.casttime} / t {mg.t}");
+                targetStrings.Add($"phase {mg.phase} / type {mg.type}");
+                targetStrings.Add($"(sx, sy) = ({mg.sx}, {mg.sy}) / (dx, dy) = ({mg.dx}, {mg.dy})");
+                targetStrings.Add($"sa {mg.sa} / da {mg.da} / sz {mg.sz} / dz {mg.dz}");
+                targetStrings.Add($"fnRunMain {mg.fnRunMain.Method.DeclaringType} : {mg.fnRunMain.Method}");
+                for (int j = 0; j < targetStrings.Count; j++) {
+                    UnifontRenderer.draw(mdText, targetStrings[j], x, y + j * 16, 1, 1, true);
+                }
             }
 
             GL.LoadProjectionMatrix(JCon.CameraProjectionTransformed);
@@ -287,21 +287,21 @@ public class Advanced {
             MeshDrawer mdGraphics = new(), mdText = new();
             mdText.activate("mist_dumper_text", UnifontRenderer.glyphMaterial, false, C32.d2c(0xFFFFFFFFU));
             mdGraphics.activate("mist_dumper_graphics", MTRX.MtrMeshNormal, false, C32.d2c(0xFFFFFFFFU));
-            var mistManager = m2d.MIST;
-            var AGen = Utils.getField<List<MistManager.MistGenerator>>(mistManager, "AGen");
+            MistManager mistManager = m2d.MIST;
+            List<MistManager.MistGenerator> AGen = Utils.getField<List<MistManager.MistGenerator>>(mistManager, "AGen");
             if (AGen != null) {
                 Dictionary<Vector2Int, ulong> dict = new();
-                var pr = Utils.getPR();
+                PR pr = Utils.getPR();
                 float prscreenx = pr?.x ?? 0, prscreeny = pr?.y ?? 0;
                 toScreen(ref prscreenx, ref prscreeny);
-                for (var ti = 0; ti < AGen.Count; ti++) {
-                    var generator = AGen[ti];
-                    var k = generator.K;
-                    var mistDrawer = k.Msd;
+                for (int ti = 0; ti < AGen.Count; ti++) {
+                    MistManager.MistGenerator generator = AGen[ti];
+                    MistManager.MistKind k = generator.K;
+                    MistDrawer mistDrawer = k.Msd;
                     if (mistDrawer == null) continue;
-                    var lst = mistDrawer.APoint;
-                    var rev = lst;
-                    var results = k?.AAtk
+                    List<MistDrawer.MstPt> lst = mistDrawer.APoint;
+                    List<MistDrawer.MstPt> rev = lst;
+                    string results = k?.AAtk
                         ?.Select(atkItem => atkItem?.SerDmg?.getRawObject())
                         ?.Where(serDmg => serDmg != null)
                         ?.SelectMany(serDmg => serDmg)
@@ -314,16 +314,16 @@ public class Advanced {
                         $"#{ti} bitmask {1UL << ti} type {k.type} {results} amount {generator.amount}",
                         prscreenx - 120, prscreeny + 160 + 16 * ti, 1, 1, true);
                     if (rev != null)
-                        foreach (var mstpt in rev) {
+                        foreach (MistDrawer.MstPt mstpt in rev) {
                             if (mstpt.active == false) continue;
-                            var v2i = new Vector2Int(mstpt.x, mstpt.y);
+                            Vector2Int v2i = new(mstpt.x, mstpt.y);
                             if (!dict.ContainsKey(v2i)) dict.Add(v2i, 0UL);
-                            dict[v2i] = dict[v2i] | (1UL << ti);
+                            dict[v2i] = dict[v2i] | 1UL << ti;
                         }
                 }
 
-                foreach (var kvp in dict) {
-                    var clenb = mp.CLENB;
+                foreach (KeyValuePair<Vector2Int, ulong> kvp in dict) {
+                    float clenb = mp.CLENB;
                     mdGraphics.Col = C32.d2c(0x7FFFFFFFU);
                     float screenx = kvp.Key.x, screeny = kvp.Key.y;
                     toScreen(ref screenx, ref screeny);
@@ -340,7 +340,7 @@ public class Advanced {
             BLIT.RenderToGLImmediate001(mdGraphics, setpass: true);
         }
 
-        var md3 = new MeshDrawer();
+        MeshDrawer md3 = new();
         md3.activate("test", UnifontRenderer.glyphMaterial, false, C32.d2c(0xFFFFFFFF));
         // md3.Box(0, 0, 56, 56);
         md3.Col = C32.d2c(0xFF000000U);
@@ -386,11 +386,11 @@ public class Advanced {
     [HarmonyPatch(typeof(IN), "LoggerStbAdd")]
     public static void onLoggerStbAdd(STB Stb) {
         if (!isAdvancedEnabled()) return;
-        var mspt = nowTicks / 1e4;
+        double mspt = nowTicks / 1e4;
         Stb.Add(" " + Application.targetFrameRate + " " + passedFrames + " " + mspt + " " + (int)(1000 / mspt) + " " +
                 lastGt + " " + passedGt);
         PR pr = (NelM2DBase.Instance as NelM2DBase)?.getPrNoel();
-        SeedSet.randCounts.TryGetValue(X.Xors, out var cnt0);
+        SeedSet.randCounts.TryGetValue(X.Xors, out long cnt0);
         long cnt1 = SeedSet.randCount;
         Stb.Add($" {cnt0} {cnt1}");
         if (pr != null) Stb.Add($" {pr.x:F6} {pr.y:F6}");
@@ -409,11 +409,11 @@ public class Advanced {
 
     public static void renderPlayer(PR pr) {
         if (!isAdvancedEnabled()) return;
-        var skill = pr.Skill;
-        var s = skill.ShE.Shield;
-        var pow = Utils.getField<float>(s, "pow");
-        var appear = s.appearable_time;
-        var ratio = pow / appear;
+        M2PrSkill skill = pr.Skill;
+        M2Shield s = skill.ShE.Shield;
+        float pow = Utils.getField<float>(s, "pow");
+        float appear = s.appearable_time;
+        float ratio = pow / appear;
         float bx = pr.x, by = pr.y;
         toScreen(ref bx, ref by);
         // Console.WriteLine($"b {bx} {by}");
@@ -421,36 +421,46 @@ public class Advanced {
         mdGraphics.activate("render_player_graphics", MTRX.MtrMeshNormal, false, C32.d2c(0xFFFFFFFF));
         mdText.activate("render_player_text", UnifontRenderer.glyphMaterial, false, C32.d2c(0xFFFFFFFF));
         drawBox(mdGraphics, bx, by + 80, pow >= 0 ? 1 - ratio : -ratio, C32.d2c(pow >= 0 ? 0xFF66CCFF : 0xFFEE0000));
-        var MKBurst = Utils.getField<MKind>(skill.getBurstSelector(), "MKBurst");
-        var faint = MDAT.calcBurstFaintedRatio(pr, MKBurst, skill.getBurstSelector().execute_count,
+        MKind MKBurst = Utils.getField<MKind>(skill.getBurstSelector(), "MKBurst");
+        float faint = MDAT.calcBurstFaintedRatio(pr, MKBurst, skill.getBurstSelector().execute_count,
             pr.Ser.burstConsumeRatio());
         drawBox(mdGraphics, bx, by + 88, Configs.configBurstFaintReverse.Value ? 1 - faint : faint,
             C32.d2c(faintColor(faint)));
         mdText.Col = new Color32(255, 255, 255, 255);
-        UnifontRenderer.draw(mdText, $"faint {faint * 100.0:F2}% {appear - pow:F2}", bx - 80, by + 116, 1, 1, true);
-        UnifontRenderer.draw(mdText, $"state {pr.get_current_state()} {pr.get_state_time():F2}", bx - 80, by + 132, 1,
-            1, true);
+        List<string> targetStrings = new();
         if (pr.Skill.getCurMagic() is { } curmg)
-            UnifontRenderer.draw(mdText, $"current magic {curmg.kind} {curmg.phase} {curmg.t:F2}", bx - 80, by + 100, 1,
-                1, true);
+            targetStrings.Add($"current magic {curmg.kind} {curmg.phase} {curmg.t:F2}");
         else
-            UnifontRenderer.draw(mdText, "current magic not present", bx - 80, by + 100, 1, 1, true);
-        UnifontRenderer.draw(mdText, $"x=({pr.x:F6}, {pr.y:F6}); v=({pr.vx:F6}, {pr.vy:F6})", bx - 80, by + 148, 1, 1,
-            true);
+            targetStrings.Add("current magic not present");
+        targetStrings.Add($"faint {faint * 100.0:F2}% {appear - pow:F2}");
+        targetStrings.Add($"state {pr.get_current_state()} {pr.get_state_time():F2}");
+        targetStrings.Add($"x=({pr.x:F6}, {pr.y:F6}); v=({pr.vx:F6}, {pr.vy:F6})");
+        float es = pr.RCenemy_sink.val;
         double num = 6f;
         if (!(pr.Mp.floort < pr.sink_ignore_skill_effect)) {
             double re = pr.getRE(RCP.RPI_EFFECT.SINK_REDUCE);
             if (re < 0) num = Math.Max(1, (1 + re) * num);
             else if (re > 0) num += 90.0 * Math.Pow(Math.Min(1, re), 2);
         }
+        drawBox(mdGraphics, bx, by + 116, (float)Math.Abs(es / num), C32.d2c(es >= 0 ? 0xFFCC66FF : 0xFF66FFCC));
+        targetStrings.Add($"sink={es:F6} / {num:F6}");
+        foreach (IRunAndDestroy runAndDestroy in pr.Mp.ARunningObject) {
+            Console.WriteLine($"runAndDestroy {runAndDestroy}");
+            if (runAndDestroy is SummonerPlayer pl) {
+                targetStrings.Add($"delay {pl.delay} delay_filled {pl.delay_filled}");
+                targetStrings.Add($"delay_one {pl.delay_one} delay_one_second {pl.delay_one_second}");
+            }
+        }
+        float currentY = by + 100;
+        foreach (string text in targetStrings) {
+            UnifontRenderer.draw(mdText, text, bx - 80, currentY, 1, 1, true);
+            currentY += 16;
+        }
 
-        var es = pr.RCenemy_sink.val;
-        drawBox(mdGraphics, bx, by + 96, (float)Math.Abs(es / num), C32.d2c(es >= 0 ? 0xFFCC66FF : 0xFF66FFCC));
-        UnifontRenderer.draw(mdText, $"sink={es:F6} / {num:F6}", bx - 80, by + 164, 1, 1, true);
-        for (var i = 0; i < 14; i++) {
-            var ok = pr.isNoDamageActive((NDMG)i);
-            var x = (i >= 7 ? 1 : -1) * 28;
-            var y = (3 - i % 7) * 12 + 18;
+        for (int i = 0; i < 14; i++) {
+            bool ok = pr.isNoDamageActive((NDMG)i);
+            int x = (i >= 7 ? 1 : -1) * 28;
+            int y = (3 - i % 7) * 12 + 18;
             mdGraphics.Col = C32.d2c(ok ? 0xFF00FF00 : 0xFFFF0000);
             mdGraphics.Box(bx + x, by + y, 8, 8);
         }

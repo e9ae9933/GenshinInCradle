@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Better;
 using m2d;
@@ -17,14 +18,15 @@ public class SummonerPlayerAdvanced : SummonerPlayer {
     }
 
     public static void log(double id, [CallerLineNumber] int line = 0) {
-        // long end = System.Diagnostics.Stopwatch.GetTimestamp();
-        // Console.WriteLine($"#{id} - Line {line} - XORSP #{SeedSet.randCount} - {end - time}");
-        // time = System.Diagnostics.Stopwatch.GetTimestamp();
+        long end = System.Diagnostics.Stopwatch.GetTimestamp();
+        Console.WriteLine($"#{id} - Line {line} - XORSP #{SeedSet.randCount} - {end - time}");
+        time = System.Diagnostics.Stopwatch.GetTimestamp();
     }
     public void prepareEnemyConentFromScript2(
         List<SmnEnemyKind> AKindL,
         List<SmnPoint> ASmnPosL,
         ref SPCntInfo CI) {
+        log(2.41);
         CsvReaderA CR = this.CR;
         if (!this.open_from_event)
             CR.VarCon.removeTemp();
@@ -33,6 +35,7 @@ public class SummonerPlayerAdvanced : SummonerPlayer {
         ENATTR nattr = ENATTR.NORMAL;
         NightController nightCon = this.Lp.nM2D.NightCon;
         QuestTracker.SummonerEntry qentry = this.QEntry;
+        log(2.42);
         if (qentry.valid && this.QEntry.fix_enemykind > 0) {
             EnemySummonerManager manager = this.Summoner.GetManager();
             if (manager != null) {
@@ -42,6 +45,7 @@ public class SummonerPlayerAdvanced : SummonerPlayer {
                 this.OMaxEnemyAppear[(flag ? "OD_" : "") + str] = new EnAppearMax(X.Mx(1, X.IntR(num) + CI.appear_add));
             }
         }
+        log(2.43);
         while (CR.read()) {
             bool fix_flag = false;
             switch (CR.cmd) {
@@ -166,7 +170,7 @@ public class SummonerPlayerAdvanced : SummonerPlayer {
                 case "%POS@":
                 case "%POS_LN":
                 case "%POS_LN@":
-                    M2LabelPoint m2LabelPoint = (M2LabelPoint)this.Lp;
+                    M2LabelPoint m2LabelPoint = this.Lp;
                     int _i1 = 0;
                     string str3 = "";
                     if (CR.cmd == "%POS@" || CR.cmd == "%POS_LN@") {
@@ -209,9 +213,208 @@ public class SummonerPlayerAdvanced : SummonerPlayer {
                     continue;
             }
         }
+        log(2.44);
         if (ASmnPosL.Count != 0)
             return;
         ASmnPosL.Add(new SmnPoint(this, 0.0f, 0.0f, 1f, XORSP()));
+        log(2.45);
+    }
+    public void prepareEnemyConentFromScript3(
+        List<SmnEnemyKind> AKindL,
+        List<SmnPoint> ASmnPosL,
+        ref SPCntInfo CI) {
+        log(2.41);
+        CsvReaderA CR = this.CR;
+        if (!this.open_from_event)
+            CR.VarCon.removeTemp();
+        CR.VarCon.define("_here", this.key);
+        CR.VarCon.define("_map", this.Lp.Mp.key);
+        ENATTR nattr = ENATTR.NORMAL;
+        NightController nightCon = this.Lp.nM2D.NightCon;
+        QuestTracker.SummonerEntry qentry = this.QEntry;
+        log(2.42);
+        if (qentry.valid && this.QEntry.fix_enemykind > 0) {
+            EnemySummonerManager manager = this.Summoner.GetManager();
+            if (manager != null) {
+                bool flag = (this.QEntry.fix_enemykind & int.MinValue) != 0;
+                string str = NDAT.ToStr((ENEMYID)this.QEntry.fix_enemykind);
+                int num = X.Mx(1, X.IntR((float)(3.5999999046325684 - X.Abs(manager.getEnemyPower(str).x) - (flag ? 3.0 : 0.0))));
+                this.OMaxEnemyAppear[(flag ? "OD_" : "") + str] = new EnAppearMax(X.Mx(1, X.IntR(num) + CI.appear_add));
+            }
+        }
+        log(2.43);
+        while (CR.read()) {
+            bool fix_flag = false;
+            switch (CR.cmd) {
+                case "%ADD_COUNT":
+                    string str1 = CR.slice_join();
+                    if (TX.isStart(str1, "*=")) {
+                        CI.count_add = X.IntR(CI.count_add * X.Nm(TX.slice(str1, 2), 1f, true));
+                        continue;
+                    }
+                    if (TX.isStart(str1, "!")) {
+                        str1 = TX.slice(str1, 1);
+                        CI.count_add = 0;
+                    }
+                    CI.count_add += (int)this.CalcScript(str1);
+                    continue;
+                case "%BGM_BLOCK":
+                    this.bgm_block_to = CR._1;
+                    continue;
+                case "%BGM_OVERRIDE_KEY":
+                    this.bgm_block_ovr = CR._2;
+                    continue;
+                case "%BGM_REPLACE_WHEN_CLOSE":
+                    this.bgm_replace_when_close = TX.eval(CR._1) != 0.0;
+                    continue;
+                case "%CANNOT_THUNDER_TO":
+                    if (this.Acannot_thunder_to_enemyid == null) this.Acannot_thunder_to_enemyid = new List<string>(CR.clength - 1);
+                    int clength = CR.clength;
+                    for (int _i = 1; _i < clength; ++_i) this.Acannot_thunder_to_enemyid.Add(CR.getIndex(_i));
+                    continue;
+                case "%DELAY_FILLED":
+                    this.delay_filled = this.Calc(CR, 1);
+                    continue;
+                case "%DELAY_ONE":
+                    this.delay_one = this.Calc(CR, 1);
+                    this.delay_one_second = this.delay_one * nightCon.summoner_delayonesecond_ratio(this);
+                    continue;
+                case "%DELAY_ONE_FIRST":
+                    this.delay_one = this.Calc(CR, 1);
+                    continue;
+                case "%EN":
+                case "%EN_OD":
+                    SmnEnemyKind enemyEntry = this.createEnemyEntry(CR, CI.splitter_id, ref CI.count_add, out fix_flag, nattr);
+                    if (enemyEntry != null) {
+                        AKindL.Add(enemyEntry);
+                        if (!fix_flag)
+                            CI.countadd_priority = X.Mn(CI.countadd_priority, enemyEntry.def_count);
+                        if (!enemyEntry.pre_overdrive && enemyEntry.EnemyDesc.overdriveable) {
+                            CI.odable_enemy_exist = true;
+                        }
+                    }
+                    continue;
+                case "%ENATTR":
+                    readEnAttr(ref nattr, CR);
+                    continue;
+                case "%EN_HR":
+                    ++CI.splitter_id;
+                    this.Asplitter_title.Add(new SplitterTerm(CR, (int)this.delay_one_second));
+                    continue;
+                case "%EN_LOAD":
+                    continue;
+                case "%FATAL":
+                    if (CR.clength < 3 || TX.eval(CR.slice_join(2)) != 0.0) {
+                        this.Summoner.fatal_key = CR._1;
+                        X.dl("フェイタルキー " + this.Summoner.fatal_key);
+                    }
+                    continue;
+                case "%GOLEMTOY_DIVIDE":
+                    golemtoy_divide_count = (int)this.Calc(CR, 1, golemtoy_divide_count.ToString());
+                    continue;
+                case "%INITIAL_DELAY":
+                    this.delay = this.Calc(CR, 1);
+                    continue;
+                case "%MAX_APPEAR":
+                case "%MAX_APPEAR_AA":
+                    bool flag = CR.cmd == "%MAX_APPEAR_AA" && this.Lp.auto_activate_enemy;
+                    if (CR.clength == 3) {
+                        qentry = this.QEntry;
+                        if (!qentry.kindMatch(CR._1)) {
+                            float num = this.CalcF(CR, ref fix_flag, 2, "99");
+                            if (!(fix_flag | flag))
+                                num = X.Mx(X.Mn(2f, num), num + CI.appear_add);
+                            string str2 = CR._1;
+                            bool _is_od = false;
+                            if (TX.isStart(str2, "OD_")) {
+                                str2 = TX.slice(str2, 3);
+                                _is_od = true;
+                            }
+                            this.OMaxEnemyAppear[str2] = new EnAppearMax(X.Mx(1, X.IntR(num)), _is_od: _is_od);
+                        }
+                        continue;
+                    }
+                    float num1 = this.CalcF(CR, ref fix_flag, 1, "99");
+                    if (!(fix_flag | flag))
+                        num1 = X.Mx(1f, num1 + CI.appear_add);
+                    this.max_enemy_appear_whole = X.Mx(2, X.IntR(num1));
+                    continue;
+                case "%MAX_CNT":
+                    if (CR.clength == 3) {
+                        qentry = this.QEntry;
+                        if (!qentry.kindMatch(CR._1)) {
+                            if (CI.OEnemyCountMax == null)
+                                CI.OEnemyCountMax = new BDic<string, int[]>(1);
+                            float num2 = this.CalcF(CR, ref fix_flag, 2, "99");
+                            if (!fix_flag)
+                                num2 += nightCon.summoner_enemy_countmax_addition(this);
+                            CI.OEnemyCountMax[CR._1] = new int[2] {
+                                X.IntR(num2),
+                                0
+                            };
+                        }
+                        continue;
+                    }
+                    float num3 = this.CalcF(CR, ref fix_flag, 1, "99");
+                    if (!fix_flag)
+                        num3 += nightCon.summoner_enemy_countmax_addition(this);
+                    CI.max_enemy_count = X.IntR(num3);
+                    continue;
+                case "%NEXT_SCRIPT":
+                    this.next_script_key = CR._1;
+                    continue;
+                case "%POS":
+                case "%POS@":
+                case "%POS_LN":
+                case "%POS_LN@":
+                    M2LabelPoint m2LabelPoint = this.Lp;
+                    int _i1 = 0;
+                    string str3 = "";
+                    if (CR.cmd == "%POS@" || CR.cmd == "%POS_LN@") {
+                        ++_i1;
+                        str3 = CR.getIndex(_i1);
+                    }
+                    if (CR.cmd == "%POS_LN@" || CR.cmd == "%POS_LN") {
+                        ++_i1;
+                        m2LabelPoint = this.Mp.getPoint(CR.getIndex(_i1)) ?? m2LabelPoint;
+                    }
+                    SmnPoint smnPoint = new(this, CR.Nm(1 + _i1), CR.Nm(2 + _i1), this.Calc(CR, 3 + _i1, "1"),
+                        XORSP(), CR.slice(4 + _i1)) {
+                        name = str3,
+                        Lp = m2LabelPoint
+                    };
+                    ASmnPosL.Add(smnPoint);
+                    continue;
+                case "%PUPPETREVENGE":
+                    if (this.Lp.is_sudden_puppetrevenge) {
+                        CsvReaderA crPuppetRevenge = this.Summoner.createCRPuppetRevenge(false);
+                        this.Summoner.fineReelData(CR._1, ref this.AReel, ref this.AReelSecretSrc, ref this.replace_reel_secret_to_lower);
+                        CR = crPuppetRevenge;
+                        CR.seek_set();
+                        CI.force_can_get_whole_reels = this.drop_all_reels_after = true;
+                    }
+                    continue;
+                case "%REPLACE_BGM":
+                    if (CR.clength < 3 || TX.eval(CR.slice_join(2)) != 0.0) {
+                        this.bgm_replace = CR._1;
+                    }
+                    continue;
+                case "%SPEVENT":
+                    if (this.Eventor == null) this.Eventor = new SummonerPlayerEventor(this);
+                    this.Eventor.read(CR, nattr, this.Asplitter_title[CI.splitter_id].title);
+                    continue;
+                default:
+                    if (!this.readOther(CR) && CR.cmd.IndexOf("#") != 0) {
+                        CR.tError("不明なコマンド: " + CR.cmd);
+                    }
+                    continue;
+            }
+        }
+        log(2.44);
+        if (ASmnPosL.Count != 0)
+            return;
+        ASmnPosL.Add(new SmnPoint(this, 0.0f, 0.0f, 1f, XORSP()));
+        log(2.45);
     }
     public override void prepareEnemyConentInner(ref bool bgm_replaced) {
         log(1);

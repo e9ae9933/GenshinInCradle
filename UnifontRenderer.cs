@@ -19,11 +19,11 @@ public class UnifontRenderer {
     public static void init() {
         glyphChara = new PxlCharacter("unifont");
         glyphChara.loadASync(Resources.unifont128_pxls);
-        var str = UTF8Encoding.UTF8.GetString(Resources.unifont_16_0_04);
-        foreach (var line in str.Split('\n')) {
-            var t = line.Trim();
+        string str = UTF8Encoding.UTF8.GetString(Resources.unifont_16_0_04);
+        foreach (string line in str.Split('\n')) {
+            string t = line.Trim();
             if (t.Length == 0) continue;
-            var glyph = new Glyph(t);
+            Glyph glyph = new(t);
             glyphs[glyph.codePoint] = glyph;
         }
     }
@@ -41,7 +41,7 @@ public class UnifontRenderer {
 
     public static void draw1(MeshDrawer md, string s, float x, float y, float scaleX, float scaleY, bool flipY) {
         // md.initForImg(pxlFrame.getImageTexture());
-        foreach (var c in s) {
+        foreach (char c in s) {
             int target = c;
             PxlFrame pxlFrame;
             if (target >= 0 && target < glyphChara.getPose(0).getSequence(0).countFrames())
@@ -54,17 +54,17 @@ public class UnifontRenderer {
 
     public static void draw0(MeshDrawer md, string s, float x, float y, float scaleX, float scaleY, bool flipY) {
         try {
-            foreach (var c in s) {
+            foreach (char c in s) {
                 int target = c;
                 if (!glyphs.ContainsKey(c)) target = 0;
-                var glyph = glyphs[target];
+                Glyph glyph = glyphs[target];
                 if (!glyphs.TryGetValue(target, out glyph)) {
                     Console.WriteLine("failed on codepoint " + target);
                     continue;
                 }
 
-                for (var i = 0; i < 16; i++)
-                for (var j = 0; j < glyph.width; j++)
+                for (int i = 0; i < 16; i++)
+                for (int j = 0; j < glyph.width; j++)
                     if (glyph.data[i, j])
                         md.RectBL(x + j * scaleX, y + (flipY ? 15 - i : i) * scaleY, scaleX, scaleY);
                 x += (glyph.width + 1) * scaleX;
@@ -81,21 +81,21 @@ public class UnifontRenderer {
         public readonly int width;
 
         public Glyph(string s) {
-            var str = s.Split(':');
-            codePoint = int.Parse(str[0], NumberStyles.HexNumber);
-            if (str[1].Length == 32) width = 8;
-            else if (str[1].Length == 64) width = 16;
+            string[] str = s.Split(':');
+            this.codePoint = int.Parse(str[0], NumberStyles.HexNumber);
+            if (str[1].Length == 32) this.width = 8;
+            else if (str[1].Length == 64) this.width = 16;
             else throw new FormatException("having " + s);
-            data = new bool[16, width];
-            var top = 0;
-            for (var i = 0; i < 16; i++)
-            for (var j = 0; j < width; j += 4) {
-                var c = str[1][top++];
+            this.data = new bool[16, this.width];
+            int top = 0;
+            for (int i = 0; i < 16; i++)
+            for (int j = 0; j < this.width; j += 4) {
+                char c = str[1][top++];
                 int val = Convert.ToByte(c + "", 16);
-                data[i, j] = (val & 8) != 0;
-                data[i, j + 1] = (val & 4) != 0;
-                data[i, j + 2] = (val & 2) != 0;
-                data[i, j + 3] = (val & 1) != 0;
+                this.data[i, j] = (val & 8) != 0;
+                this.data[i, j + 1] = (val & 4) != 0;
+                this.data[i, j + 2] = (val & 2) != 0;
+                this.data[i, j + 3] = (val & 1) != 0;
             }
         }
     }

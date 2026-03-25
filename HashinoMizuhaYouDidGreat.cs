@@ -41,10 +41,10 @@ public class HashinoMizuhaYouDidGreat {
     [HarmonyPatch(typeof(MagicItem), "init")]
     public static void MagicItem_init(MagicItem __instance, int _id, M2MagicCaster _Caster, MGKIND _kind,
         MGHIT _hittype) {
-        var mg = __instance;
-        var lv = Configs.configMistakeAssignReportLevel.Value;
-        var returned = mg.killed || mg.closed;
-        var casterKilled = mg.Caster == null || mg.Caster as M2Mover == null;
+        MagicItem mg = __instance;
+        int lv = Configs.configMistakeAssignReportLevel.Value;
+        bool returned = mg.killed || mg.closed;
+        bool casterKilled = mg.Caster == null || mg.Caster as M2Mover == null;
         if (lv >= 1 && !returned && (lv >= 2 || !casterKilled)) {
             UILog.Instance.AddAlert($"错误覆写：将 {mg.id}; {getName(mg.Caster)}; {mg.kind} 覆写为 " +
                                     $"{_id}; {getName(_Caster)}; {_kind}");

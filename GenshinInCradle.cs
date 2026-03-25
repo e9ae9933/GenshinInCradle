@@ -30,7 +30,7 @@ internal class GenshinInCradle : BaseUnityPlugin {
         // Plugin startup logic
         Logger = base.Logger;
         try {
-            Configs.init(Config);
+            Configs.init(this.Config);
             Logger.LogInfo("patching GenshinInCradle");
             Harmony.CreateAndPatchAll(typeof(GenshinInCradle));
             Logger.LogInfo("patching SeedSet");
@@ -53,7 +53,7 @@ internal class GenshinInCradle : BaseUnityPlugin {
             Harmony.CreateAndPatchAll(typeof(Screenshot));
             Logger.LogInfo("patching HashinoMizuhaYouDidGreat");
             Harmony.CreateAndPatchAll(typeof(HashinoMizuhaYouDidGreat));
-            
+
             Screenshot.StartSequence(this);
         }
         catch (Exception e) {
@@ -80,38 +80,35 @@ internal class GenshinInCradle : BaseUnityPlugin {
                 UILogRow row = COOK.autoSave(nm2d, false, true);
             }
         }
-        if (Configs.configGetAllItemsShortcut.Value.IsDown())
-        {
+        if (Configs.configGetAllItemsShortcut.Value.IsDown()) {
             NelM2DBase nm2d = (NelM2DBase)M2DBase.Instance;
-            NelItemManager imng =nm2d.IMNG;
-            ItemStorage storage=imng.getHouseInventory();
-            foreach (KeyValuePair<string,NelItem> pair in NelItem.OData)
-            {
-                for (int g = 0; g < 5; g++)
-                {
+            NelItemManager imng = nm2d.IMNG;
+            ItemStorage storage = imng.getHouseInventory();
+            foreach (KeyValuePair<string, NelItem> pair in NelItem.OData) {
+                for (int g = 0; g < 5; g++) {
                     int n = 1000 - storage.getCount(pair.Value, g);
-                    if(n>0) storage.Add(pair.Value, n, g, true, true);
+                    if (n > 0) storage.Add(pair.Value, n, g);
                 }
             }
             UILog.Instance.AddAlert("已获得所有物品……");
         }
         if (Configs.configSetSeedShortcut.Value.IsDown()) {
             try {
-                var s1 = Utils.getField<uint[]>(NightController.Xors, "Randseed");
-                var s2 = Utils.getField<uint[]>(NightController.Xors, "RandseedFirst");
-                var k = SeedSet.randCount;
-                var str = Utils.ShowInputDialog($"""
-                                                输入种子 2。
-                                                种子 2 应当是用逗号和空格隔开的 4 个非负整数。
-                                                当前正在使用偏移系数 {k}，请确认偏移系数无误（正常来说，应该是144）
-                                                """,null);
-                var seq = str.Split([',', ' ', '\t', '\n'], StringSplitOptions.RemoveEmptyEntries);
-                var target = new uint[4];
-                for (var i = 0; i < 4; i++)
+                uint[] s1 = Utils.getField<uint[]>(NightController.Xors, "Randseed");
+                uint[] s2 = Utils.getField<uint[]>(NightController.Xors, "RandseedFirst");
+                int k = SeedSet.randCount;
+                string str = Utils.ShowInputDialog($"""
+                                                    输入种子 2。
+                                                    种子 2 应当是用逗号和空格隔开的 4 个非负整数。
+                                                    当前正在使用偏移系数 {k}，请确认偏移系数无误（正常来说，应该是144）
+                                                    """, null);
+                string[] seq = str.Split([',', ' ', '\t', '\n'], StringSplitOptions.RemoveEmptyEntries);
+                uint[] target = new uint[4];
+                for (int i = 0; i < 4; i++)
                     target[i] = uint.Parse(seq[i]);
-                for (var i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                     s1[i] = s2[i] = target[i];
-                for (var i = 0; i < k; i++)
+                for (int i = 0; i < k; i++)
                     NightController.Xors.get0();
                 SeedSet.randCount = k;
                 UILog.Instance.AddLog("偏移系数: " + SeedSet.randCount);
@@ -124,9 +121,9 @@ internal class GenshinInCradle : BaseUnityPlugin {
             }
         }
         else if (Configs.configGetSeedShortcut.Value.IsDown()) {
-            var s1 = Utils.getField<uint[]>(NightController.Xors, "Randseed");
-            var s2 = Utils.getField<uint[]>(NightController.Xors, "RandseedFirst");
-            var sb = new StringBuilder();
+            uint[] s1 = Utils.getField<uint[]>(NightController.Xors, "Randseed");
+            uint[] s2 = Utils.getField<uint[]>(NightController.Xors, "RandseedFirst");
+            StringBuilder sb = new();
             sb.AppendFormat("种子1: {0} {1} {2} {3}\n", s1[0], s1[1], s1[2], s1[3]);
             sb.AppendFormat("种子2: {0} {1} {2} {3}\n", s2[0], s2[1], s2[2], s2[3]);
             sb.AppendLine("到现在已经进行的随机次数: " + SeedSet.randCount);

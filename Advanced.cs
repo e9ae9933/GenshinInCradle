@@ -339,8 +339,37 @@ public class Advanced {
             BLIT.RenderToGLImmediate001(mdText, setpass: true);
             BLIT.RenderToGLImmediate001(mdGraphics, setpass: true);
         }
+        if (Configs.configDisplayMapGrid.Value)
+        {
+            int minGridX = 0;
+            int maxGridX = mp.clms;
+            int minGridY = 0;
+            int maxGridY = mp.rows;
+            float gridSize = mp.CLENB;
 
-        MeshDrawer md3 = new();
+            MeshDrawer gridMeshDrawer = new MeshDrawer(null, 4, 6);
+            gridMeshDrawer.activate("map_grid_graphics", MTRX.MtrMeshNormal, false, C32.d2c(uint.MaxValue), null);
+            gridMeshDrawer.Col = C32.d2c(2147483647U);
+
+            for (int gridY = minGridY; gridY < maxGridY; gridY++)
+            {
+                float screenX = (float)minGridX;
+                float screenY = (float)gridY;
+                Advanced.toScreen(ref screenX, ref screenY);
+                gridMeshDrawer.Line(screenX, screenY, screenX + gridSize * maxGridX, screenY, 2);
+            }
+
+            for (int gridX = minGridX; gridX < maxGridX; gridX++)
+            {
+                float screenX = (float)gridX;
+                float screenY = (float)minGridY;
+                Advanced.toScreen(ref screenX, ref screenY);
+                gridMeshDrawer.Line(screenX, screenY, screenX, screenY - gridSize * maxGridY, 2);
+            }
+            GL.LoadProjectionMatrix(JCon.CameraProjectionTransformed);
+            BLIT.RenderToGLImmediate001(gridMeshDrawer, setpass: true);
+        }
+            MeshDrawer md3 = new();
         md3.activate("test", UnifontRenderer.glyphMaterial, false, C32.d2c(0xFFFFFFFF));
         // md3.Box(0, 0, 56, 56);
         md3.Col = C32.d2c(0xFF000000U);

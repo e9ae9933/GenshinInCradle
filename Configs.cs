@@ -22,6 +22,7 @@ public class Configs {
     public static ConfigEntry<bool> configSuppressDamageFlow;
     public static ConfigEntry<bool> configSuppressNonSensitive;
     public static ConfigEntry<bool> configDisplayMist;
+    public static ConfigEntry<bool> configDisplayMapGrid;
     public static ConfigEntry<bool> configDisplayAttackBox;
     public static ConfigEntry<bool> configDisplayBoundingBox;
     public static ConfigEntry<bool> configDisplayMapBox;
@@ -49,6 +50,7 @@ public class Configs {
         configAdvancedBoxMode = Config.Bind("高级功能", "碰撞箱显示模式", 2,
             new ConfigDescription("1 为旧版（不建议），2 为新版", new AcceptableValueRange<int>(1, 2)));
         configDisplayMist = Config.Bind("高级功能", "显示毒雾判定箱", false);
+        configDisplayMapGrid = Config.Bind("高级功能", "显示地图坐标网格", false);
         configDisplayAttackBox = Config.Bind("高级功能", "显示攻击判定箱", true);
         configDisplayBoundingBox = Config.Bind("高级功能", "显示实体碰撞箱", true);
         configDisplayMapBox = Config.Bind("高级功能", "显示地图碰撞箱", false);
